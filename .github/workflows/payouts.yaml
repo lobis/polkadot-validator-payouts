@@ -78,7 +78,8 @@ jobs:
             --maximum-history-eras 84 \
             --maximum-calls 4 \
             --disable-matrix \
-            --seed-path /seed.txt
+            --seed-path /seed.txt \
+            once
 
   polkadot-payments:
     name: Polkadot Payments
@@ -117,4 +118,5 @@ jobs:
             --maximum-history-eras 84 \
             --maximum-calls 4 \
             --disable-matrix \
-            --seed-path /seed.txt
+            --seed-path /seed.txt \
+            once
