@@ -1,4 +1,4 @@
-name: Build and Run Crunch for Polkadot and Kusama validator payments
+name: Validator Payments
 
 on:
   workflow_dispatch:
@@ -35,3 +35,80 @@ jobs:
           name: crunch-image
           path: crunch-image.tar.gz
 
+  kusama-payments:
+    name: Kusama Payments
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      SEED_FILE: ./seed.txt
+    steps:
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: crunch-image
+
+      - name: Load Docker image
+        run: docker load < crunch-image.tar.gz
+
+      - name: Write seed to file
+        run: echo "${{ secrets.PAYMENTS_ACCOUNT_SEED }}" > $SEED_FILE
+
+      - name: Read validator stashes
+        id: kusama_stashes
+        run: |
+          STASHES=$(paste -sd, validators/kusama)
+          echo "stashes=$STASHES" >> $GITHUB_OUTPUT
+
+      - name: Run Crunch (Kusama)
+        run: |
+          docker run --rm \
+            -v $(pwd)/$SEED_FILE:/seed.txt \
+            crunch:latest kusama \
+            --stashes ${{ steps.kusama_stashes.outputs.stashes }} \
+            rewards \
+            --maximum-history-eras 84 \
+            --maximum-calls 4 \
+            --disable-matrix \
+            --seed-path /seed.txt
+
+  polkadot-payments:
+    name: Polkadot Payments
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      SEED_FILE: ./seed.txt
+    steps:
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: crunch-image
+
+      - name: Load Docker image
+        run: docker load < crunch-image.tar.gz
+
+      - name: Write seed to file
+        run: echo "${{ secrets.PAYMENTS_ACCOUNT_SEED }}" > $SEED_FILE
+
+      - name: Read validator stashes
+        id: polkadot_stashes
+        run: |
+          STASHES=$(paste -sd, validators/polkadot)
+          echo "stashes=$STASHES" >> $GITHUB_OUTPUT
+
+      - name: Run Crunch (Polkadot)
+        run: |
+          docker run --rm \
+            -v $(pwd)/$SEED_FILE:/seed.txt \
+            crunch:latest polkadot \
+            --stashes ${{ steps.polkadot_stashes.outputs.stashes }} \
+            rewards \
+            --maximum-history-eras 84 \
+            --maximum-calls 4 \
+            --disable-matrix \
+            --seed-path /seed.txt
