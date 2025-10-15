@@ -62,6 +62,9 @@ jobs:
       - name: Write seed to file
         run: echo "${{ secrets.PAYMENTS_ACCOUNT_SEED }}" > $SEED_FILE
 
+      - name: Echo contents of seed file
+        run: cat $SEED_FILE
+
       - name: Read validator stashes
         id: kusama_stashes
         run: |
