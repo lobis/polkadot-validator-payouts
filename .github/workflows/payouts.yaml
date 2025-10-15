@@ -2,6 +2,12 @@ name: Validator Payments
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *" # Every day at 00:00 UTC
+
+concurrency:
+  group: validator-payments
+  cancel-in-progress: true
 
 jobs:
   build:
