@@ -1,0 +1,37 @@
+name: Build and Run Crunch for Polkadot and Kusama validator payments
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Docker image
+    runs-on: ubuntu-latest
+    outputs:
+      image-name: crunch:latest
+    steps:
+      - name: Checkout current repo
+        uses: actions/checkout@v4
+
+      - name: Checkout turboflakes/crunch
+        uses: actions/checkout@v4
+        with:
+          repository: turboflakes/crunch
+          path: crunch-repo
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image from turboflakes/crunch Dockerfile
+        run: |
+          docker build -f crunch-repo/Dockerfile.alpine -t crunch:latest crunch-repo
+
+      - name: Save Docker image as artifact
+        run: docker save crunch:latest | gzip > crunch-image.tar.gz
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: crunch-image
+          path: crunch-image.tar.gz
+
