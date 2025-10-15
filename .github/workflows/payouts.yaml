@@ -59,7 +59,7 @@ jobs:
       - name: Read validator stashes
         id: kusama_stashes
         run: |
-          STASHES=$(paste -sd, validators/kusama)
+          STASHES=$(tr '\n' ',' < validators/kusama | sed 's/,$//')
           echo "stashes=$STASHES" >> $GITHUB_OUTPUT
 
       - name: Run Crunch (Kusama)
@@ -98,7 +98,7 @@ jobs:
       - name: Read validator stashes
         id: polkadot_stashes
         run: |
-          STASHES=$(paste -sd, validators/polkadot)
+          STASHES=$(tr '\n' ',' < validators/kusama | sed 's/,$//')
           echo "stashes=$STASHES" >> $GITHUB_OUTPUT
 
       - name: Run Crunch (Polkadot)
