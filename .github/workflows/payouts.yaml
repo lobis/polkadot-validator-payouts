@@ -60,15 +60,12 @@ jobs:
         run: docker load < crunch-image.tar.gz
 
       - name: Write seed to file
-        run: echo "${{ secrets.PAYMENTS_ACCOUNT_SEED }}" > $SEED_FILE
-
-      - name: Echo contents of seed file
-        run: cat $SEED_FILE
+        run: echo "${{ secrets.PAYOUTS_ACCOUNT_SEED }}" > $SEED_FILE
 
       - name: Read validator stashes
         id: kusama_stashes
         run: |
-          STASHES=$(awk 'ORS="," {print}' validators/kusama | sed 's/,$//')
+          STASHES=$(awk '{ sub(/\r$/,""); if (length($0)) { printf "%s%s", sep, $0; sep="," } } END { print "" }' validators/kusama)
           echo "stashes=$STASHES" >> $GITHUB_OUTPUT
 
       - name: Run Crunch (Kusama)
@@ -102,12 +99,12 @@ jobs:
         run: docker load < crunch-image.tar.gz
 
       - name: Write seed to file
-        run: echo "${{ secrets.PAYMENTS_ACCOUNT_SEED }}" > $SEED_FILE
+        run: echo "${{ secrets.PAYOUTS_ACCOUNT_SEED }}" > $SEED_FILE
 
       - name: Read validator stashes
         id: polkadot_stashes
         run: |
-          STASHES=$(awk 'ORS="," {print}' validators/kusama | sed 's/,$//')
+          STASHES=$(awk '{ sub(/\r$/,""); if (length($0)) { printf "%s%s", sep, $0; sep="," } } END { print "" }' validators/polkadot)
           echo "stashes=$STASHES" >> $GITHUB_OUTPUT
 
       - name: Run Crunch (Polkadot)
