@@ -1,2 +1,4 @@
 # polkadot-validator-payouts
-Reward payouts for Polkadot validators
+
+Reward payouts for Polkadot validators.
+
